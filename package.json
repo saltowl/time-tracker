@@ -1,0 +1,35 @@
+{
+	"name": "TimeTracker",
+	"description": "Simple time tracker for VS Code",
+	"version": "0.0.1",
+	"publisher": "saltowl",
+	"repository": "",
+	"engines": {
+		"vscode": "^1.27.0"
+	},
+    "categories": ["Other"],
+	"activationEvents": ["*"],
+	"main": "./extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "extension.startWorkSession",
+				"title": "Start work session"
+			},
+            {
+				"command": "extension.stopWorkSession",
+				"title": "Stop work session"
+			},
+            {
+				"command": "extension.pauseWorkSession",
+				"title": "Pause"
+			}
+		]
+	},
+	"scripts": {
+		"postinstall": "node ./node_modules/vscode/bin/install"
+	},
+	"devDependencies": {
+		"vscode": "^1.1.22"
+	}
+}
