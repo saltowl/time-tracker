@@ -1,5 +1,5 @@
 {
-	"name": "TimeTracker",
+	"name": "time-tracker",
 	"description": "Simple time tracker for VS Code",
 	"version": "0.0.1",
 	"publisher": "saltowl",
