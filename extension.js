@@ -1,3 +1,4 @@
+"use strict";
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
@@ -15,23 +16,19 @@ class TimeTracker {
     this.statusBarItem.command = "extension.pauseWorkSession";
     this.statusBarItem.show();
 
-    vscode.commands.registerCommand(
-      "extension.pauseWorkSession",
-      this.togglePause
-    );
+    vscode.commands.registerCommand("extension.pauseWorkSession", () => {
+      this.togglePause();
+    });
 
-    vscode.commands.registerCommand(
-      "extension.stopWorkSession",
-      this.stopWorkSession
-    );
+    vscode.commands.registerCommand("extension.stopWorkSession", () => {
+      this.stopWorkSession();
+    });
 
-    vscode.commands.registerCommand(
-      "extension.startWorkSession",
-      this.startWorkSession
-    );
+    vscode.commands.registerCommand("extension.startWorkSession", () => {
+      this.startWorkSession();
+    });
 
-    var self = this;
-    this.recomputeStatusBar(self);
+    this.recomputeStatusBar();
   }
 }
 
@@ -40,7 +37,7 @@ class TimeTracker {
 function activate(context) {
   console.log('Congratulations, your extension "time-tracker" is now active!');
 
-  tab = new TimeTracker(context);
+  var tab = new TimeTracker(context);
   context.subscriptions.push(tab);
 }
 
@@ -53,7 +50,8 @@ module.exports = {
   deactivate
 };
 
-TimeTracker.prototype.startWorkSession = (displayMessage = true) => {
+TimeTracker.prototype.startWorkSession = function() {
+  var displayMessage = true;
   if (displayMessage) {
     vscode.window.showInformationMessage("Work session started!");
   }
@@ -62,7 +60,7 @@ TimeTracker.prototype.startWorkSession = (displayMessage = true) => {
   this.recomputeStatusBar();
 };
 
-TimeTracker.prototype.stopWorkSession = () => {
+TimeTracker.prototype.stopWorkSession = function() {
   vscode.window.showInformationMessage("Work session stopped!");
 
   this.paused = false;
@@ -72,7 +70,7 @@ TimeTracker.prototype.stopWorkSession = () => {
   this.recomputeStatusBar();
 };
 
-TimeTracker.prototype.togglePause = () => {
+TimeTracker.prototype.togglePause = function() {
   this.paused = !this.paused;
 
   if (this.inBreak) {
@@ -100,7 +98,7 @@ TimeTracker.prototype.togglePause = () => {
   this.recomputeStatusBar();
 };
 
-TimeTracker.prototype.toggleBreak = () => {
+TimeTracker.prototype.toggleBreak = function() {
   this.inBreak = !this.inBreak;
 
   if (this.inBreak) {
@@ -118,69 +116,56 @@ TimeTracker.prototype.toggleBreak = () => {
   this.recomputeStatusBar();
 };
 
-TimeTracker.prototype.createInterval = () => {
+TimeTracker.prototype.createInterval = function() {
   this.invervalId = setInterval(() => {
     this.setStatusBarText();
     this.setStatusBarTooltip();
   }, 1000);
 };
 
-TimeTracker.prototype.clearInterval = () => {
+TimeTracker.prototype.clearInterval = function() {
   clearInterval(this.invervalId);
 };
 
-TimeTracker.prototype.setStatusBarText = self => {
-  text = "";
-  if (typeof self === undefined) {
-    self = this;
-  }
-  if (self.paused) {
+TimeTracker.prototype.setStatusBarText = function() {
+  var text = "";
+  if (this.paused) {
     text = "$(x)";
-  } else if (self.inBreak) {
+  } else if (this.inBreak) {
     text = "$(clock)";
   } else {
     text = "$(triangle-right)";
   }
 
   text += "  ";
-  if (self.inBreak) {
+  if (this.inBreak) {
     text += "Taking a break";
   }
-  self.statusBarItem.text = text;
+  this.statusBarItem.text = text;
 };
 
-TimeTracker.prototype.setStatusBarTooltip = self => {
-  text = "";
-  if (typeof self === undefined) {
-    self = this;
-  }
-  if (self.paused) {
+TimeTracker.prototype.setStatusBarTooltip = function() {
+  var text = "";
+  if (this.paused) {
     text = `You worked for ...`;
-  } else if (!self.paused) {
+  } else if (!this.paused) {
     text = `You are working for ...`;
   }
-  self.statusBarItem.tooltip = text;
+  this.statusBarItem.tooltip = text;
 };
 
-TimeTracker.prototype.setStatusBarColor = self => {
+TimeTracker.prototype.setStatusBarColor = function() {
   var color;
-  if (typeof self === undefined) {
-    self = this;
-  }
-  if (self.paused || self.inBreak) {
+  if (this.paused || this.inBreak) {
     color = new vscode.ThemeColor("descriptionForeground");
-  } else if (self.breakMessageShown) {
+  } else if (this.breakMessageShown) {
     color = new vscode.ThemeColor("errorForeground");
   }
-  self.statusBarItem.color = color;
+  this.statusBarItem.color = color;
 };
 
-TimeTracker.prototype.recomputeStatusBar = self => {
-  if (typeof self === undefined) {
-    self = this;
-  }
-
-  self.setStatusBarColor(self);
-  self.setStatusBarTooltip(self);
-  self.setStatusBarText(self);
+TimeTracker.prototype.recomputeStatusBar = function() {
+  this.setStatusBarColor();
+  this.setStatusBarTooltip();
+  this.setStatusBarText();
 };
