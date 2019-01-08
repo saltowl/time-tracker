@@ -2,42 +2,102 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-
 /**
  * @param {vscode.ExtensionContext} context
  */
-function activate(context) {
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
+class TimeTracker {
+
+	constructor(context) {
+		this.context = context;
+		this.paused = false;
+		this.inBreak = false;
+		
+		this.statusBarItem = vscode.window.createStatusBarItem();
+		this.statusBarItem.command = 'extension.pauseWorkSession';
+		this.statusBarItem.show();
+
+		vscode.commands.registerCommand('extension.pauseWorkSession', this.togglePause);
+
+		vscode.commands.registerCommand(
+		  'extension.stopWorkSession',
+		  this.stopWorkSession
+		);
+
+		vscode.commands.registerCommand(
+		  'extension.startWorkSession',
+		  this.startWorkSession
+		);
+
+		// this.recomputeStatusBar();
+	  };
+}
+
+// this method is called when your extension is activated
+// your extension is activated the very first time the command is executed
+ function activate(context) {
 	console.log('Congratulations, your extension "time-tracker" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	let startSession = vscode.commands.registerCommand('extension.startWorkSession', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Start work session');
-	});
-
-	let stopSession = vscode.commands.registerCommand('extension.stopWorkSession', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Stop work session');
-	});
-
-	context.subscriptions.push(startSession);
-	context.subscriptions.push(stopSession);
+	tab = new TimeTracker(context);
+	context.subscriptions.push(tab);
 }
 
 // this method is called when your extension is deactivated
 function deactivate() {}
 
 module.exports = {
+	TimeTracker,
 	activate,
 	deactivate
 }
+
+TimeTracker.prototype.startWorkSession = function (displayMessage = true) {
+
+	if (displayMessage) {
+	  vscode.window.showInformationMessage('Work session started!');
+	}
+
+	// this.createInterval();
+	// this.recomputeStatusBar();
+};
+
+TimeTracker.prototype.stopWorkSession = () => {
+
+    vscode.window.showInformationMessage('Work session stopped!');
+
+    this.paused = false;
+	this.inBreak = false;
+	
+    // this.clearInterval();
+    // this.recomputeStatusBar();
+};
+
+TimeTracker.prototype.togglePause = () => {
+    
+	this.paused = !this.paused;
+	
+    if (this.inBreak) {
+      vscode.window
+        .showWarningMessage(
+          `You can't pause because you are in a break`,
+          'Stop break'
+        )
+        .then(e => {
+          if (e) {
+            // this.toggleBreak();
+          }
+        });
+      this.paused = !this.paused; // revert to original
+      return;
+	}
+	
+    if (this.paused) {
+    //   this.clearInterval();
+      vscode.window.showInformationMessage('Paused!');
+    } else {
+    //   this.createInterval();
+      vscode.window.showInformationMessage(
+        this.paused ? 'Paused!' : 'Resumed!'
+      );
+    }
+    // this.recomputeStatusBar();
+};
