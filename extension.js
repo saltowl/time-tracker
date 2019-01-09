@@ -3,6 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
 const moment = require("moment");
+const momentDurationFormatSetup = require("moment-duration-format");
 
 var TimeType = Object.freeze({
   Break: "b",
@@ -12,10 +13,12 @@ var TimeType = Object.freeze({
   WorkSessionStop: "ws_stop"
 });
 const workSpaceConfig = vscode.workspace.getConfiguration("time-tracker");
-const saveWorkSessionBetweenStartups = workSpaceConfig.get(
+
+const SAVE_WORK_SESSIONS_BETWEEN_STARTUPS = workSpaceConfig.get(
   "saveWorkSessionBetweenStartups"
 );
-const SAVE_WORK_SESSIONS_BETWEEN_STARTUPS = saveWorkSessionBetweenStartups;
+const TIME_FORMAT_LONG = workSpaceConfig.get("longTimeFormat");
+const TIME_FORMAT_SHORT = workSpaceConfig.get("shortTimeFormat");
 const STORAGE_DATE_FORMAT_ID = "D/M/Y";
 
 /**
@@ -93,7 +96,11 @@ TimeTracker.prototype.stopWorkSession = function() {
     );
     return;
   }
-  vscode.window.showInformationMessage("Work session stopped!");
+  vscode.window.showInformationMessage(
+    `Work session stopped! You worked ${this.formatTime(
+      this.logger.workSession
+    )}`
+  );
 
   this.logger.workSession = 0;
   this.logger.add(TimeType.WorkSessionStop);
@@ -187,17 +194,21 @@ TimeTracker.prototype.setStatusBarText = function() {
     text += "Start work session!";
   } else if (this.inBreak) {
     text += "Taking a break";
+  } else {
+    text += this.formatTime(this.logger.workSession, this.paused);
   }
-
   this.statusBarItem.text = text;
 };
 
 TimeTracker.prototype.setStatusBarTooltip = function() {
   var text = "";
   if (this.paused) {
-    text = `You worked for ...`;
+    text = `You worked for ${this.formatTime(this.logger.workSession, true)}!`;
   } else if (!this.paused) {
-    text = `You are working for ...`;
+    text = `You are working for ${this.formatTime(
+      this.logger.workSession,
+      true
+    )}!`;
   }
   this.statusBarItem.tooltip = text;
 };
@@ -216,6 +227,11 @@ TimeTracker.prototype.recomputeStatusBar = function() {
   this.setStatusBarColor();
   this.setStatusBarTooltip();
   this.setStatusBarText();
+};
+
+TimeTracker.prototype.formatTime = function(seconds, long = false) {
+  const duration = moment.duration(seconds, "seconds");
+  return duration.format(long ? TIME_FORMAT_LONG : TIME_FORMAT_SHORT);
 };
 
 class Logger {
