@@ -1,35 +1,52 @@
 {
-	"name": "time-tracker",
-	"description": "Simple time tracker for VS Code",
-	"version": "0.0.1",
-	"publisher": "saltowl",
-	"repository": "",
-	"engines": {
-		"vscode": "^1.27.0"
-	},
-    "categories": ["Other"],
-	"activationEvents": ["*"],
-	"main": "./extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "extension.startWorkSession",
-				"title": "Start work session"
-			},
-            {
-				"command": "extension.stopWorkSession",
-				"title": "Stop work session"
-			},
-            {
-				"command": "extension.pauseWorkSession",
-				"title": "Pause"
-			}
-		]
-	},
-	"scripts": {
-		"postinstall": "node ./node_modules/vscode/bin/install"
-	},
-	"devDependencies": {
-		"vscode": "^1.1.22"
-	}
+  "name": "time-tracker",
+  "description": "Simple time tracker for VS Code",
+  "version": "0.0.1",
+  "publisher": "saltowl",
+  "repository": "",
+  "engines": {
+    "vscode": "^1.27.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.startWorkSession",
+        "title": "Start work session"
+      },
+      {
+        "command": "extension.stopWorkSession",
+        "title": "Stop work session"
+      },
+      {
+        "command": "extension.pauseWorkSession",
+        "title": "Pause"
+      }
+    ]
+  },
+  "configuration": {
+    "type": "object",
+    "title": "Time Tracker",
+    "properties": {
+      "time-tracker.saveWorkSessionBetweenStartups": {
+        "type": "boolean",
+        "default": false,
+        "description": "Save work session between startups. If unchecked, the current work session will be ended when the editor closes."
+      }
+    }
+  },
+  "scripts": {
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "devDependencies": {
+    "moment": "^2.23.0",
+    "moment-duration-format": "^2.2.2",
+    "vscode": "^1.1.22"
+  }
 }
