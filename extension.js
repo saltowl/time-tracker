@@ -265,16 +265,13 @@ Logger.prototype.saveWorkData = function(data) {
   this.workTimes = [];
 
   this.globalState.update("times", {
-    ...oldData,
-    [this.getCurrentDay()]: [...this.getDataFromToday(), ...data]
+    oldData,
+    [this.getCurrentDay()]: [this.getDataFromToday(), data]
   });
 };
 
-Logger.prototype.getDataFromToday = function(type) {
+Logger.prototype.getDataFromToday = function() {
   let data = this.getDataFromDay(this.getCurrentDay());
-  if (type) {
-    return data.filter(e => e.type === type);
-  }
   return data;
 };
 
