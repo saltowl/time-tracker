@@ -286,43 +286,6 @@ Logger.prototype.getDataFromDay = function(time) {
 Logger.prototype.allData = function() {
   this.globalState.get("times");
 };
-/**
- * Get last time blocks
- * @param  {[TimeType]|TimeType} timeType -
- */
-Logger.prototype.lastWorkTypes = function(timeType) {
-  const allData = this.allData();
-  // get all time keys and reverse the array wso we can access it with index 0 the newest
-  let dates = Object.keys(allData).reverse();
-  // store all filtered time block in an array
-  let lastTimeBlocks = [];
-  // while we haven't found any time blocks and we still have date objects remaining to search for
-  while (!lastTimeBlocks.length && dates.length) {
-    lastTimeBlocks = allData[dates[0]];
-    // get current day array object [{}, {}, {}] and
-    if (timeType) {
-      // filter by the work type(s) if it is specified
-      lastTimeBlocks = lastTimeBlocks.filter(
-        ({ type }) =>
-          Array.isArray(timeType) // if searched types are an array
-            ? timeType.indexOf(type) !== -1
-            : type === timeType // if it's a string
-      );
-    }
-
-    //remove first element from the reversed array
-    dates.shift();
-  }
-  return lastTimeBlocks;
-};
-
-Logger.prototype.setHourlyRate = function(value) {
-  this.globalState.update("hrate", value);
-};
-
-Logger.prototype.getHourlyRate = function() {
-  this.globalState.get("hrate");
-};
 
 Logger.prototype.getCurrentDay = function() {
   moment().format(STORAGE_DATE_FORMAT_ID);
